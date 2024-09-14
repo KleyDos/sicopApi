@@ -47,12 +47,16 @@ async function openWebPage() {
       timeout: 5000,
     });
 
-    await topFrame.click('li[title="Consulta Ciudadanos"] a');
+    await topFrame.click('li[title="Consulta Ciudadanos"] a', {
+      timeout: 5000,
+    });
 
     console.log('Clicked on "Consulta Ciudadanos"');
     const frames = await page.frames();
-    const leftFrame = frames.find((f) => f.name() === "leftFrame");
+    // await page.waitForTimeout(2000);
 
+    const leftFrame = frames.find((f) => f.name() === "leftFrame");
+    // console.log("leftFrame es:", leftFrame);
     if (!leftFrame) {
       console.log("leftFrame not found!");
     }
@@ -65,7 +69,7 @@ async function openWebPage() {
     await leftFrame.waitForSelector(
       'li[title="Historial de participación"] a',
       {
-        timeout: 30000,
+        timeout: 5000,
       }
     );
 
@@ -96,9 +100,9 @@ async function openWebPage() {
     }
     console.log("Successfully found tableFrame!");
 
-
     // const tableContent = await tableFrame.content();
     // console.log(tableContent);
+
     const tableData = await rightFrame.evaluate(() => {
       console.log("en proceso...");
       const rows = document.querySelectorAll("table.eptable tr");
@@ -118,7 +122,7 @@ async function openWebPage() {
     });
     console.log(tableData);
 
-    // await tableContent.waitForSelector("table.eptable");
+    await tableContent.waitForSelector("table.eptable");
     console.log("continue...");
   } else {
     console.log("topFrame not found!");
