@@ -115,7 +115,26 @@ async function openWebPage() {
           cell.textContent.trim()
         );
 
-        data.push(rowData);
+        //data.push(rowData);
+
+        if (index > 0) {
+          data.push(
+            rowData.reduce((acc, val, i) => {
+              console.log("val :>>", val);
+              console.log("i :>>", i);
+              console.log("acc :>>", acc);
+
+              if (i === 0) {
+                acc.procediento = val.split("\n\t\t")[0];
+                acc.institucion = val.split("\n\t\t")[1];
+              }
+              if (i === 1) {
+                acc.partida = val;
+              }
+              return acc;
+            }, {})
+          );
+        }
         console.log(rowData, "rowData");
       });
       return data;
@@ -128,8 +147,8 @@ async function openWebPage() {
     console.log("topFrame not found!");
   }
 
-  await browser.close();
-  process.exit(0);
+  // await browser.close();
+  // process.exit(0);
 }
 
 openWebPage();
