@@ -1,11 +1,13 @@
 import mongoose, { Schema } from "mongoose";
 
-const concursos = mongoose.Schema(
+const concursos = new mongoose.Schema(
   {
-    institucion: { type: String, required: true },
-    procedimiento: { type: String, required: true },
-    sicopNo: { type: String, required: true },
-    detalle: { type: String, required: true },
+    procedimiento: { type: String },
+    institucion: { type: String },
+    partida: { type: String },
+    descripcion: { type: String },
+    fecha: { type: String },
+    monto: { type: String },
   },
   {
     collection: "Concursos",

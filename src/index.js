@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import mongoose from "mongoose";
 import express from "express";
+import modelConcursos from "./model/concursos.js";
 
-// import modelConcursos from "./model/concursos";
 const server = express();
 
 const uri =
@@ -100,8 +100,8 @@ async function openWebPage() {
     }
     console.log("Successfully found tableFrame!");
 
-    // const tableContent = await tableFrame.content();
-    // console.log(tableContent);
+    const tableContent = await tableFrame.content();
+    console.log(tableContent);
 
     const tableData = await rightFrame.evaluate(() => {
       console.log("en proceso...");
@@ -119,20 +119,28 @@ async function openWebPage() {
 
         if (index > 0) {
           data.push(
-            rowData.reduce((acc, val, i) => {
-              console.log("val :>>", val);
-              console.log("i :>>", i);
-              console.log("acc :>>", acc);
+            {
+              procedimiento: rowData[0] ? rowData[0].split("\n\t\t")[0] : null,
+              institucion: rowData[0] ? rowData[0].split("\n\t\t")[1] : null,
+              partida: rowData[1] || null,
+              descripcion: rowData[2] || null,
+              fecha: rowData[3] || null,
+              monto: rowData[5] || null,
+            }
+            // rowData.reduce((acc, val, i) => {
+            //   console.log("val :>>", val);
+            //   console.log("i :>>", i);
+            //   console.log("acc :>>", acc);
 
-              if (i === 0) {
-                acc.procediento = val.split("\n\t\t")[0];
-                acc.institucion = val.split("\n\t\t")[1];
-              }
-              if (i === 1) {
-                acc.partida = val;
-              }
-              return acc;
-            }, {})
+            //   if (i === 0) {
+            //     acc.procediento = val.split("\n\t\t")[0];
+            //     acc.institucion = val.split("\n\t\t")[1];
+            //   }
+            //   if (i === 1) {
+            //     acc.partida = val;
+            //   }
+            //   return acc;
+            // }, {})
           );
         }
         console.log(rowData, "rowData");
@@ -140,6 +148,27 @@ async function openWebPage() {
       return data;
     });
     console.log(tableData);
+
+    // tableData.forEach(async (item) => {
+    //   const nuevoConcurso = new modelConcursos(item);
+    //   try {
+    //     await nuevoConcurso.save();
+    //     console.log("Datos guardados en MOngoDB:", item);
+    //   } catch (error) {
+    //     console.log("Error al guardar los datos:", error);
+    //   }
+    // });
+
+    try {
+      const savePromises = tableData.map(async (item) => {
+        const nuevoConcurso = new modelConcursos(item);
+        return await nuevoConcurso.save();
+      });
+      await Promise.all(savePromises);
+      console.log("Datos guardados en MOngoDB:", item);
+    } catch (error) {
+      console.log("Erorr al guardar los datos", error);
+    }
 
     await tableContent.waitForSelector("table.eptable");
     console.log("continue...");
