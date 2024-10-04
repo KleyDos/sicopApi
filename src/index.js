@@ -89,6 +89,9 @@ async function openWebPage() {
 
     await rightFrame.waitForSelector('input[name="biz_reg_no"]');
     await rightFrame.type('input[name="biz_reg_no"]', "3101125558");
+    await rightFrame.waitForSelector('select[name="page_size"]');
+    await rightFrame.select('select[name="page_size"]', "600");
+    console.log("Successfully changed 600!");
     await rightFrame.click('a[title="Consultar"]');
     console.log("Successfully searched!");
     // await rightFrame.waitForNavigation({ waitUntil: "networkidle0" });
@@ -147,7 +150,10 @@ async function openWebPage() {
       });
       return data;
     });
+
     console.log(tableData);
+
+    // Prueba para guardar en base de
 
     // tableData.forEach(async (item) => {
     //   const nuevoConcurso = new modelConcursos(item);
@@ -159,25 +165,42 @@ async function openWebPage() {
     //   }
     // });
 
+    // Guardar base de datos
     try {
       const savePromises = tableData.map(async (item) => {
         const nuevoConcurso = new modelConcursos(item);
         return await nuevoConcurso.save();
       });
       await Promise.all(savePromises);
-      console.log("Datos guardados en MOngoDB:", item);
+      console.log("Datos guardados en MOngoDB");
     } catch (error) {
       console.log("Erorr al guardar los datos", error);
     }
 
-    await tableContent.waitForSelector("table.eptable");
-    console.log("continue...");
+    // await tableContent.waitForSelector("table.eptable");
+    // console.log("continue...");
+
   } else {
     console.log("topFrame not found!");
   }
 
-  // await browser.close();
-  // process.exit(0);
+  // const total = frames.find((f) => f.name() === "total");
+  // if (!total) {
+  //   console.log("total not found!");
+  // }
+
+  // console.log("Successfully found total!");
+
+  // await total.waitForSelector('id[alt="siguiente 10"] a', {
+  //   timeout: 5000,
+  // });
+
+  // await total.click('id[alt="siguiente 10"] a');
+
+  // console.log('Clicked on "siguiente 10"');
+
+  await browser.close();
+  process.exit(0);
 }
 
 openWebPage();
